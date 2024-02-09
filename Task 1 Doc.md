@@ -8,8 +8,7 @@
   5.	The detailed section of the report, could be utilized for budgeting, staffing, or even keeping track of the best/worst-performing stores. The summary section, is more focused on the sales per staff member; this metric could be 
       utilized to track staff performance, provide incentives, calculate merit increases, etc.
   6.	This report should be run on at least a quarterly basis but preferably a monthly basis to monitor trends more accurately.
-
-DETAILED TABLE
+<!--DETAILED TABLE
 - Fields:
     - report_id SERIAL (Primary Key)
     - store_id INT (Foreign Key – Store Table)
@@ -20,11 +19,12 @@ SUMMARY TABLE
 - Fields:
   - report_id SERIAL (Foreign Key – Detailed Table)
   - store_id INT (Foreign Key – Store Table)
-  - avg_sales_per_staff (total_sales / num_staff) – Detailed Table 
-
+  - avg_sales_per_staff (total_sales / num_staff) – Detailed Table
+  -->
+ ![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/6a1b3f07-bcb5-41c8-9534-bd2c472cd9ae)
 
 #### B. SQL Queries to create the two tables above
-
+<!--
 - CREATE TABLE store_sales_detailed_report
   - report_id SERIAL,
   - store_id INT,
@@ -48,10 +48,12 @@ SUMMARY TABLE
     - FOREIGN KEY(store_id)
       - REFERENCES store(store_id)
       - ON DELETE CASCADE 
- 
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/8903afef-0923-4f7f-9957-4af3a2a1851f)
+
 
 #### C. The INSERT INTO statement that will populate the detailed report and, in turn, the summary table.
-
+<!--
 INSERT INTO store_sales_detailed_report (store_id, total_sales, num_staff)
 - SELECT store.store_id, x.num_rentals AS total_sales, y.num_staff
 - FROM store
@@ -64,19 +66,24 @@ INSERT INTO store_sales_detailed_report (store_id, total_sales, num_staff)
     - WHERE active = 'true'
     - GROUP BY store.store_id
   - ) y ON y.store_id = store.store_id;
- 
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/9259fa82-c8b7-4523-81af-12a6d8c40106)
+
 *The above query populates the table with all the necessary information. Cross referencing the store and staff tables we can verify some of the information.*
 
 *To verify the rental count, we will use a simple count statement on the rental table.*
-
+<!--
 SELECT COUNT(**) AS num_rentals_by_staff\
 FROM rental\
 WHERE staff_id = 1 OR staff_id = 2\
 GROUP BY staff_id;
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/8ea73f71-b98d-4820-90e7-9ffe208bd254)
+
 
 #### D. Create a practical function that could assist the organization in this scenario.
 *(Solution - create a function that assigns each store a more human-readable name based on their store ID and a store_names table.)*
-
+<!--
  CREATE OR REPLACE FUNCTION get_store_name(num INT)
  - RETURNS VARCHAR(50)
  - LANGUAGE plpgsql
@@ -90,10 +97,12 @@ $$
    - );
 - END;\
 $$   
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/c2f5a59e-928f-4d12-a74a-64b59b946af6)
 
 
 #### E. Create a function/trigger update the summery table each time the detailed report is updated
-
+<!--
 CREATE OR REPLACE FUNCTION add_summary_row()
 RETURNS TRIGGER\
 LANGUAGE plpgsql\
@@ -111,12 +120,14 @@ AFTER INSERT OR UPDATE\
 ON "store_sales_detailed_report"\
 FOR EACH ROW\
 EXECUTE PROCEDURE add_summary_row();
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/f8fdd509-4b2d-46a2-8a3d-a4fcd2872642)
 
 
 #### F. The following store procedure will clear the detailed and summary tables, then insert new data into the detailed table using the previously specified SELECT statement. 
 *The add_summary_row_trigger then extracts and transforms the data from the detailed table and inserts it into the summary table. 
 Unfortunately, POSTGRESQL doesn’t have any built-in scheduling tools, but this procedure can be called a monthly or quarterly basis using a job schedule in Linux CRUNTAB or Agent pgAgent.*
-
+<!--
 -- Store procedure - should be run monthly and/or quarterly minimum for fresh reporting --\
 CREATE OR REPLACE PROCEDURE run_store_sales_report()\
 LANGUAGE plpgsql\
@@ -153,4 +164,7 @@ INSERT INTO store_sales_detailed_report (store_id, total_sales, num_staff)
 
 END;\
 $$
-  
+-->
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/4869a247-290d-448a-9f1c-74ca0de59af1)
+![image](https://github.com/jamesdunaway95/2022-JD-Advanced-Data-Management/assets/79390069/eb7e724f-1fa8-4395-b136-df09ac0949fe)
+
